@@ -1,5 +1,4 @@
-//Description: Continuously asks if the user wants to
-//               do an operation on the specified number.
+//Description: Performs number operations as many times as required
 //Programmers: Emmanuel Valdueza, Jake P Ogsimer, Mark L Perez
 //Created: Oct-02-2019 | Oct-08-2019
 
@@ -9,19 +8,19 @@
 
 using std::cin;
 using std::cout;
+using std::string;
 
 double currentNumber = 0.0, numFollowUp;
 bool firstNumAlreadyAsked = false, keepGoing = true;
-char op;
-std::string operaString, doAgain = "n";
+string op;
+string operaString, doAgain = "n";
 
-std::string showOperationType(char op);
-char convertToChar(std::string opera);
-double calculation(char operation, double num);
+string showOperationType(string);
+double calculation(string, double num);
+
 void welcome();
 void askNumber();
 void askOperation();
-void askForNextNumber();
 void result();
 void askToKeepGoing();
 
@@ -47,7 +46,7 @@ int main()
 void askToKeepGoing()
 {
   cout << "\n\nType \"yes\" to do another opertaion"
-       << " on the result else type \"exit\". ";
+       << " on the result or type \"exit\". ";
   cin >> doAgain;
   if (doAgain != "yes")
     keepGoing = false;
@@ -66,10 +65,9 @@ void askOperation()
   while (invalidOperation)
   {
     cout << "Enter an operation \"+, -, / or *\": ";
-    cin >> operaString;
-    op = convertToChar(operaString);
+    cin >> op;
 
-    if (op == '+' || op == '-' || op == '/' || op == '*')
+    if (op == "+" || op == "-" || op == "/" || op == "*")
     {
       invalidOperation = false;
     }
@@ -100,11 +98,15 @@ void askNumber()
       cin >> currentNumber;
     }
 
-    //Blackbox area - its only job is to check if input is numerical
-    if (cin.fail())
+    if (cin.fail()) //cin.fail() becomes true if input is not of specified data type
     {
-      cin.clear();
+      cin.clear(); //resets cin.fail() to false
       cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      /*cin.ignore() clears the characters that would make cin.fail() true
+        where the first argument indicates no limit to the number of characters
+        to ignore and the second argument the character from which to stop ignoring
+        which is the character for enter.
+      */
       cout << "Invalid input. ";
     }
     else
@@ -112,6 +114,7 @@ void askNumber()
       firstNumAlreadyAsked = true;
       isValid = 1;
     }
+
   } while (isValid == 0);
 }
 
@@ -121,41 +124,28 @@ void welcome()
        << "operations as required. \n\n";
 }
 
-char convertToChar(std::string opera)
+double calculation(string operation, double num)
 {
-  return opera[0]; //returns first char of word
-}
-
-double calculation(char operation, double num)
-{
-  switch (operation)
-  {
-  case '+':
+  if (operation == "+")
     return currentNumber = currentNumber + num;
-  case '-':
+  if (operation == "-")
     return currentNumber = currentNumber - num;
-  case '*':
+  if (operation == "*")
     return currentNumber = currentNumber * num;
-  case '/':
+  if (operation == "/")
     return currentNumber = currentNumber / num;
-  default:
-    return 404;
-  }
+  return 0;
 }
 
-std::string showOperationType(char op)
+string showOperationType(string op)
 {
-  switch (op)
-  {
-  case '+':
+  if (op == "+")
     return "to add to ";
-  case '-':
+  if (op == "-")
     return "to subtract from ";
-  case '*':
+  if (op == "*")
     return "to multiply with ";
-  case '/':
+  if (op == "/")
     return "to divide ";
-  default:
-    return "[Not Valid]";
-  }
+  return 0;
 }

@@ -1,5 +1,4 @@
-//Description: Continuously asks if the user wants to
-//               do an operation on the specified number.
+//Description: Performs number operations as many times as required
 //Programmers: Emmanuel Valdueza, Jake P Ogsimer, Mark L Perez
 //Created: Oct-02-2019 | Oct-08-2019
 
@@ -100,11 +99,15 @@ void askNumber()
       cin >> currentNumber;
     }
 
-    //Blackbox area - its only job is to check if input is numerical
-    if (cin.fail())
+    if (cin.fail()) //cin.fail() becomes true if input is not of specified data type
     {
-      cin.clear();
+      cin.clear(); //resets cin.fail() to false
       cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      /*cin.ignore() clears the characters that would make cin.fail() true
+        where the first argument indicates no limit to the number of characters
+        to ignore and the second argument the character from which to stop ignoring
+        which is the character for enter.
+      */
       cout << "Invalid input. ";
     }
     else
@@ -112,6 +115,7 @@ void askNumber()
       firstNumAlreadyAsked = true;
       isValid = 1;
     }
+
   } while (isValid == 0);
 }
 
