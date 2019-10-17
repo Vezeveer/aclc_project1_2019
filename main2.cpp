@@ -1,124 +1,182 @@
-//Description: Performs number operations as many times as required
+//Title: A Simple Calculator
+//Description: Performs number calculations as many times as required
 //Programmers: Emmanuel Valdueza, Jake P Ogsimer, Mark L Perez
 //Created: Oct-02-2019 | Oct-08-2019
 
 #include <iostream>
-#include <limits> //library for handling cin unwanted input
+#include <limits> //library to help handle cin unwanted input
 #include <string>
 
-using std::cin; //prevents identifier naming conflicts
+using std::cin; //prevents namespace naming conflicts
 using std::cout;
 using std::string;
 
-string operationAsked;
-bool invalidOp = true, repeatedOperation = false;
+string userOperatorInput, savedOperator;
 double secondNum, result, firstNum;
 
-string changeWords(string operation);
+bool invalidOp = true, loopProgram = false;
+bool displayFirstNum = false, displayOpera = false;
+bool displaySecondNum = false, displayResultNum = false;
+
+string changeWords(string operation); //changes sentence accordingly
 double calculate(string operation, double first, double second);
-void promptToExit();
 bool isItAValidOperation(string op);
 bool isItAValidNumber(bool yesNo);
-double askNumber(bool);
-void showResults();
-void welcomeMessage();
+double askNumber(bool); //returns a number if valid
 void askOperation(bool repeatedOpera);
-void display();
+void refreshExitDisplay(); //asks user to exit or continue
+void refreshDisplay();		 //changes what is displayed accordingly
 
 int main()
 {
-	display();
+	refreshDisplay();
 	do
 	{
-		if (!repeatedOperation)
+		if (!loopProgram)
 		{
-			welcomeMessage();
-			firstNum = askNumber(repeatedOperation);
-			askOperation(repeatedOperation);
+			firstNum = askNumber(loopProgram);
+			displayFirstNum = true;
+			refreshDisplay();
+			askOperation(loopProgram);
+			displayOpera = true;
 		}
 
+		refreshDisplay();
 		secondNum = askNumber(true);
-		result = calculate(operationAsked, firstNum, secondNum);
+		displaySecondNum = true;
+		result = calculate(userOperatorInput, firstNum, secondNum);
+		displayResultNum = true;
 
-		showResults();
-		promptToExit();
+		refreshExitDisplay();
 
-		cin >> operationAsked;
-		if (isItAValidOperation(operationAsked))
-		{
-			firstNum = result;
-			repeatedOperation = true;
-		}
-		else
-		{
-			cout << "\n\n\n# You chose to exit the program. #\n\n\n\n";
-			repeatedOperation = false;
-		}
-	} while (repeatedOperation);
+	} while (loopProgram);
 
 	system("pause");
 	return 0;
 }
 
-void display()
+void refreshDisplay()
 {
-	system("CLS");
-	cout << "\n##                                                                   ## "
-			 << "\n# This program will perform one or more calculations as required  #"
-			 << "\n##                                                                   ##"
+	system("CLS"); //clears a previous refreshDisplay()
+	cout << "\n"
+			 << "\n-- This program will perform one or more calculations as required --"
 			 << "\n"
-			 << "\nLeft Hand Number: _"
-			 << "\nOperation Symbol: _"
-			 << "\nRight Hand Number: _"
-			 << "\nResult: _"
-			 << "\n"
-			 << "\nEnter Left Hand Number: ";
+			 << "\n";
+
+	cout << "\nLeft Hand Number: ";
+	if (displayFirstNum)
+		cout << firstNum;
+	else
+		cout << "_ ";
+
+	cout << "\nOperation Symbol: ";
+	if (displayOpera)
+		cout << userOperatorInput;
+	else
+		cout << "_ ";
+
+	cout << "\nRight Hand Number: ";
+	if (displaySecondNum)
+		cout << secondNum;
+	else
+		cout << "_ ";
+
+	cout << "\nResult: ";
+	if (displayResultNum)
+		cout << result;
+	else
+		cout << "_ ";
+
+	cout << "\n";
 }
 
-void welcomeMessage()
+void refreshExitDisplay()
 {
-	cout << "\nThis program will perform one or more "
-			 << "operations as required. \n\n";
+	bool loopExitPrompt = true;
+	do
+	{
+		refreshDisplay();
+		cout << "\n\nEnter +, -, *, /, Operation Symbol or any other character to EXIT: ";
+		savedOperator = userOperatorInput; //we want to keep the operator during this loop
+		cin >> userOperatorInput;
+		if (isItAValidOperation(userOperatorInput))
+		{
+			firstNum = result;
+			loopProgram = true;
+			displaySecondNum = false;
+			displayResultNum = false;
+			loopExitPrompt = false;
+		}
+		else
+		{
+			string exitYesNo;
+			cout << "Are you sure you want to exit? 'y' for yes, any characters for no. ";
+			cin >> exitYesNo;
+			if (exitYesNo == "y" || exitYesNo == "Y")
+			{
+				cout << "\n\n\n# You chose to exit the program. #\n\n\n\n";
+				loopProgram = false;
+				loopExitPrompt = false;
+			}
+			else
+			{
+				userOperatorInput = savedOperator;
+				loopProgram = true;
+			}
+		}
+	} while (loopExitPrompt);
 }
 
 void askOperation(bool repeatedOpera)
 {
+	bool passedOnce = false;
 	if (!repeatedOpera)
 	{
 		do
 		{
-			cout << "Type +, -, * or /: ";
-			cin >> operationAsked;
-			if (!isItAValidOperation(operationAsked))
-				cout << "Please ";
-		} while (!isItAValidOperation(operationAsked));
+			if (!isItAValidOperation(userOperatorInput) && passedOnce)
+				cout << "\n-- Invalid Input --\nEnter +, -, *, /, Operation Symbol:";
+			else
+				cout << "\n\nEnter +, -, *, /, Operation Symbol: ";
+			cin >> userOperatorInput;
+			passedOnce = true;
+			refreshDisplay();
+		} while (!isItAValidOperation(userOperatorInput));
 	}
 }
 
-void showResults()
-{
-	cout << "\n    Result: "
-			 << firstNum << " "
-			 << operationAsked << " "
-			 << secondNum << " = "
-			 << result << "\n";
-}
-
-double askNumber(bool repeatedOpera)
+double askNumber(bool repeatedOpera) //returns a number if valid
 {
 	double num;
+	bool didItFail = true;
 	do
 	{
 		if (repeatedOpera)
 		{
-			cout << "\nEnter number "
-					 << changeWords(operationAsked)
-					 << firstNum << ": ";
+			if (didItFail)
+			{
+				cout << "\n\nEnter number "
+						 << changeWords(userOperatorInput)
+						 << firstNum << ": ";
+			}
+			else
+			{
+				cout << "\n-- Invalid Input --\nEnter number "
+						 << changeWords(userOperatorInput)
+						 << firstNum << ": ";
+			}
 		}
 		else
-			cout << "\nEnter number: ";
+		{
+			if (didItFail)
+				cout << "\n\nEnter number ";
+			else
+				cout << "\n-- Invalid Input --\nEnter number ";
+		}
 		cin >> num;
-	} while (!isItAValidNumber(cin.fail()));
+		refreshDisplay();
+		didItFail = isItAValidNumber(cin.fail());
+	} while (!didItFail);
 	return num;
 }
 
@@ -141,9 +199,7 @@ bool isItAValidOperation(string op)
 	if (op == "+" || op == "-" || op == "*" || op == "/")
 		return true;
 	else
-	{
 		return false;
-	}
 }
 
 string changeWords(string operation)
@@ -160,14 +216,7 @@ string changeWords(string operation)
 	return ""; //will never reach
 }
 
-void promptToExit()
-{
-	cout << "\nType any of the ff operations."
-			 << "\nInvalid input will exit program."
-			 << "\n+, -, *, /:";
-}
-
-bool isItAValidNumber(bool yesNo)
+bool isItAValidNumber(bool yesNo) //returns true if valid
 {
 	if (yesNo)
 	{
@@ -180,7 +229,6 @@ bool isItAValidNumber(bool yesNo)
 			second argument the character from which to stop ignoring
       which is the character for enter.
     */
-		cout << "Invalid input. ";
 		return false;
 	}
 	else
