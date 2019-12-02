@@ -1,7 +1,7 @@
 //Title: A Simple Calculator
 //Description: Performs number calculations as many times as required
 //Programmers: Emmanuel Valdueza, Jake P Ogsimer, Mark L Perez
-//Created: Oct-02-2019 | Oct-08-2019
+//Created: Oct-02-2019 | Updated: Oct-17-2019
 
 #include <iostream>
 #include <limits> //library to help handle cin unwanted input
